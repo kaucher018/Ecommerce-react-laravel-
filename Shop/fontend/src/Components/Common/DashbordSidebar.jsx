@@ -9,7 +9,7 @@ const DashbordSidebar = () => {
    const navigate = useNavigate();
   return (
     <div>
-      <div className="min-h-screen flex bg-gray-100">
+      <div className="h-full flex bg-gray-100">
       {/* Sidebar */}
       <div className="w-64 bg-white shadow-md p-6">
         <h2 className="text-xl font-semibold mb-8">Dashboard</h2>

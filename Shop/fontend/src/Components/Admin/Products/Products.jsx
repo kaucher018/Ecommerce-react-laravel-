@@ -30,7 +30,9 @@ const deleteCategory = async(id) => {
     }).then(res => res.json())
     .then(result => {
         if(result.status == 200){
-            fetchproducts();
+          const newproducts = products.filter(product => product.id !== id);
+            setProducts(newproducts);
+            // fetchproducts();
             toast.success(result.message);
         }else{
             console.log("Error");

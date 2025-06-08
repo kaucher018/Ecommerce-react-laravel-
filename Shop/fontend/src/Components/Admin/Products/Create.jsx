@@ -10,12 +10,16 @@ import { useEffect } from "react";
 import JoditEditor from "jodit-react";
 import { useNavigate } from "react-router-dom";
 
-
-
 const Create = ({ placeholder }) => {
   const editor = useRef(null);
   const [content, setContent] = useState("");
-  const nvagate = useNavigate();
+  const [gallary, setgallary] = useState([]);
+  const [gallaryimage, setgallaryimage] = useState([]);
+  const [categories, setcategories] = useState([]);
+  const [brands, setBrands] = useState([]);
+   const [sizes, setsize] = useState(null);
+  const [checksizes, setchecksizes] = useState([]);
+  const navigate = useNavigate();
 
   const config = useMemo(
     () => ({
@@ -31,20 +35,18 @@ const Create = ({ placeholder }) => {
     formState: { errors },
   } = useForm();
 
-
-
-
+  // fetch adding product Api
   const savedata = async (data) => {
-    
     const formdata = {
       ...data,
-      "description": content
-    }
+      description: content,
+      gallary: gallary,
+    };
     console.log(formdata);
     await fetch(`${API_URL}products`, {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Accept: "application/json",
         Authorization: `Bearer ${token()}`,
       },
@@ -53,7 +55,7 @@ const Create = ({ placeholder }) => {
       .then((res) => res.json())
       .then((result) => {
         if (result.status == 200) {
-          nvagate("/products");
+          navigate("/products");
           toast.success(result.message);
         } else {
           console.log("Error");
@@ -61,8 +63,7 @@ const Create = ({ placeholder }) => {
       });
   };
 
-  const [categories, setcategories] = useState([]);
-  const [brands, setBrands] = useState([]);
+  //fetch categories
   const fetchCategories = async () => {
     await fetch(`${API_URL}categories`, {
       method: "GET",
@@ -82,6 +83,7 @@ const Create = ({ placeholder }) => {
       });
   };
 
+  //fetch brands
   const fetchbrands = async () => {
     await fetch(`${API_URL}brands`, {
       method: "GET",
@@ -104,7 +106,62 @@ const Create = ({ placeholder }) => {
   useEffect(() => {
     fetchCategories();
     fetchbrands();
+    fetchsizes();
   }, []);
+
+  //insert image
+  const handlefile = async (e) => {
+    const formdata = new FormData();
+    const file = e.target.files[0];
+    formdata.append("image", file);
+
+    await fetch(`${API_URL}temp`, {
+      method: "POST",
+      headers: {
+        Accept: "Application/json",
+        Authorization: `Bearer ${token()}`,
+      },
+      body: formdata,
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        gallary.push(result.data.id);
+        // setgallary(prev => [...prev,result.data.id]);
+        setgallary(gallary);
+
+        const img = [...gallaryimage, result.data.image_url];
+
+        // gallaryimage.push(result.data.image_url);
+        setgallaryimage(img);
+        // setgallaryimage(gallaryimage);
+        e.target.value = "";
+      });
+  };
+  const handleDeleteImage = (image) => {
+    const newGalleryImage = gallaryimage.filter((gallary) => gallary != image);
+    setgallaryimage(newGalleryImage);
+  };
+
+  const fetchsizes = async () => {
+    await fetch(`${API_URL}sizes`, {
+      method: "GET",
+      headers: {
+        "Content-type": "application/json",
+        Accept: "Application/json",
+        Authorization: `Bearer ${token()}`,
+      },
+    })
+      .then((res) => res.json())
+      .then((result) => {
+        if (result.status == 200) {
+          setsize(result.sizes);
+        } else {
+          console.log("error");
+        }
+      });
+  };
+
 
   return (
     <>
@@ -115,17 +172,22 @@ const Create = ({ placeholder }) => {
         <div className="flex-1 p-6">
           <div className="grid grid-cols-1 md:grid-cols-1 gap-6">
             <h2 className="text-2xl font-semibold">Create New Product</h2>
-
+ <button className="bg-teal-400 hover:bg-teal-500 text-white px-4 py-2 rounded"  onClick={() => navigate("/products")} >
+          BACK
+        </button>
             <div className="p-6 bg-gray-50 flex justify-center items-center ">
               <div className="flex justify-between items-center mb-4">
-
-     {/* product details */}
+                {/* product details */}
                 <div className="w-150">
                   <form onSubmit={handleSubmit(savedata)}>
                     <div className="form-group ">
-                      <label className="block mb-2 text-sm font-medium text-gray-900">Name:</label>
+                      <label className="block mb-2 text-sm font-medium text-gray-900">
+                        Name:
+                      </label>
                       <input
-                        {...register("title", { required: "title is required" })}
+                        {...register("title", {
+                          required: "title is required",
+                        })}
                         type="text"
                         placeholder="Enter product title"
                       />
@@ -136,7 +198,7 @@ const Create = ({ placeholder }) => {
                       )}
                     </div>
 
-      {/* product catagory  and band */}
+    {/* product catagory  and band */}
                     <div className="flex gap-5">
                       <div className="form-group">
                         <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -147,7 +209,6 @@ const Create = ({ placeholder }) => {
                           {...register("category_id", {
                             required: "category is required",
                           })}
-                        
                         >
                           <option value=""> Select a Category </option>
                           {categories.map((category) => (
@@ -172,7 +233,6 @@ const Create = ({ placeholder }) => {
                           {...register("brand_id", {
                             required: "brand is required",
                           })}
-                         
                         >
                           <option value=""> Select a Brand</option>
                           {brands.map((brand) => (
@@ -189,29 +249,23 @@ const Create = ({ placeholder }) => {
                       </div>
                     </div>
 
-          {/* product short description */}
+ {/* product short description */}
                     <div>
                       <label
                         htmlFor=""
                         className="block mb-2 text-sm font-medium text-gray-900"
                       >
-                      
                         Short description
                       </label>
                       <textarea
                         className="from-group border border-black p-1 rounded w-full"
-                        {
-                          ...register("Short_description"
-                           
-                          )
-                        }
-                       
+                        {...register("Short_description")}
                         placeholder="Enter short description"
                         rows={3}
                       ></textarea>
                     </div>
-                    
-           {/* product description */}
+
+  {/* product description */}
                     <div>
                       <label className="block mb-2 text-sm font-medium text-gray-900 mt-4">
                         Description
@@ -225,8 +279,10 @@ const Create = ({ placeholder }) => {
                       />
                     </div>
 
-              {/* product price */}
-              <span className="block mb-2 text-xl font-medium text-gray-900 mt-8">Pricing</span>
+                    {/* product price */}
+                    <span className="block mb-2 text-xl font-medium text-gray-900 mt-8">
+                      Pricing
+                    </span>
                     <div className="flex gap-40 mt-4">
                       <div className="form-group">
                         <label className="block mb-2 text-sm font-medium text-gray-900">
@@ -253,22 +309,18 @@ const Create = ({ placeholder }) => {
                         </label>
                         <input
                           className="border border-black p-1 rounded w-45"
-                          {
-                            ...register("compare_price", 
-                              
-                            )
-                          }
+                          {...register("compare_price")}
                           type="number"
-                         
                           placeholder="Enter Discount Price"
                         />
                       </div>
                     </div>
-{/* product inventory */}
-                    
- <span className="block mb-2 text-xl font-medium text-gray-900 mt-4">Inventory </span>
+ {/* product inventory */}
+
+                    <span className="block mb-2 text-xl font-medium text-gray-900 mt-4">
+                      Inventory
+                    </span>
                     <div className="flex gap-5 mt-4 mb-4">
-                     
                       <div>
                         <label className="block mb-2 text-sm font-medium text-gray-900">
                           Quantity:
@@ -290,19 +342,15 @@ const Create = ({ placeholder }) => {
                       </div>
 
                       <div>
-                        <label className="block mb-2 text-sm font-medium text-gray-900">      
+                        <label className="block mb-2 text-sm font-medium text-gray-900">
                           Bracode
                         </label>
                         <input
                           className="border border-black p-1 rounded w-45"
-                          {...register("barcode", 
-                            
-                          )}
+                          {...register("barcode")}
                           type="text"
-                        
                           placeholder="Enter bracode"
                         />
-                       
                       </div>
                     </div>
 
@@ -316,7 +364,6 @@ const Create = ({ placeholder }) => {
                           {...register("status", {
                             required: "status is required",
                           })}
-                        
                         >
                           <option value=""> Set a status</option>
                           <option value="1">Active</option>
@@ -333,24 +380,81 @@ const Create = ({ placeholder }) => {
                         <label
                           htmlFor=""
                           className="block mb-2 text-sm font-medium text-gray-900"
-                        >       
+                        >
                           SKU
                         </label>
                         <input
-
                           className="from-group border border-black p-1 rounded w-45"
-                          {
-                            ...register("sku", {
-                              required: "sku is required",
-                            })
-                          }
-                     
+                          {...register("sku", {
+                            required: "sku is required",
+                          })}
                           placeholder="Enter sku"
                         />
                       </div>
                     </div>
 
-                    {/* {product imges} */}
+
+<div className="form-group">
+                        <label className="block mb-2 text-sm font-medium text-gray-900">
+                          Featured:
+                        </label>
+                        <select
+                          className="border border-black p-1 rounded w-45"
+                          {...register("is_featured")}
+                        >
+                          <option value=""> Is featured?</option>
+                          <option value="yes">YES</option>
+                          <option value="no">NO</option>
+                        </select>
+                        {errors.status && (
+                          <span className="text-red-500">
+                            {errors.status.message}
+                          </span>
+                        )}
+                      </div>
+                    
+
+
+                    {/* product sizes */}
+                    <span className="block mb-2 text-xl font-medium text-gray-900 mt-4">
+                      Sizes
+                    </span>
+
+                    <div className="flex gap-5 mt-4 mb-4">
+  {sizes && sizes.map((size) => (
+    <div key={`psize-${size.id}`}>
+      <input
+      {
+        ...register("size")
+      }
+      checked = {checksizes.includes(size.id)}
+      onChange={(e)=> {
+        if (e.target.checked) {
+          setchecksizes([...checksizes, size.id]);
+        } else {
+          setchecksizes(checksizes.filter((id) => id != size.id));
+        }
+      }}
+        id={`size-${size.id}`}
+        type="checkbox"
+        value={size.id}
+        className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+      />
+      <label
+        htmlFor={`size-${size.id}`}
+        className="ms-2 text-sm font-medium text-black-900 dark:text-black-300"
+      >
+        {size.name}
+      </label>
+    </div>
+  ))}
+</div>
+
+     {/* {product imges} */}
+
+                    <span className="block mb-2 text-xl font-medium text-gray-900 mt-4">
+                      Gallary
+                    </span>
 
                     <div className="flex gap-5 mt-4 mb-4">
                       <div>
@@ -358,10 +462,9 @@ const Create = ({ placeholder }) => {
                           Product Image:
                         </label>
                         <input
-                          className="from-group border border-black p-1 rounded w-150"
-                          {...register("image" )}
+                          onChange={handlefile}
                           type="file"
-                      
+                          className="from-group border border-black p-1 rounded w-150"
                         />
                         {errors.image && (
                           <span className="text-red-500">
@@ -371,6 +474,35 @@ const Create = ({ placeholder }) => {
                       </div>
                     </div>
 
+  {/* show selected images */}
+
+                    <div className="flex gap-5 mt-4 mb-4 ">
+                      <div>
+                        {gallaryimage &&
+                          gallaryimage.map((image, index) => {
+                            return (
+                              <>
+                                <span>Selected Images:</span>
+                                <div className="m-2" key={`image-${index}`}>
+                                  <img
+                                    src={image}
+                                    alt=""
+                                    className="w-50 h-50"
+                                  />
+                                  <div>
+                                    <button
+                                      onClick={() => handleDeleteImage(image)}
+                                      className="bg-red-500 text-white p-2"
+                                    >
+                                      Delete
+                                    </button>
+                                  </div>
+                                </div>
+                              </>
+                            );
+                          })}
+                      </div>
+                    </div>
                     <button type="submit">Create Product</button>
                   </form>
                 </div>

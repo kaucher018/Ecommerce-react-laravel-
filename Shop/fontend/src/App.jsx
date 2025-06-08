@@ -1,33 +1,138 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react'
+import Navbar from './Components/Navbar/Navbar'
+import Hero from './Components/Hero/Hero'
+import Products from './Components/Products/Products'
+import AOS from 'aos'
+import "aos/dist/aos.css"
+import TopProducts from './Components/TopProducts/TopProducts'
+import Banner from './Components/Banner/Banner'
+import Subscribe from './Components/Subscribe/Subscribe'
+import Testimonial from './Components/Testimonial/Testimonial'
+import Footer from './Components/Footer/Footer'
+import Popup from './Components/Popup/Popup'
+import Login from './Components/Admin/Login'
+import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import Home from './Components/Home/Home'
+// import { ToastContainer } from 'react-toastify'
+import SignUp from './Components/Admin/SingUp'
+import Dashbord from './Components/Admin/Dashbord'
+import { ToastContainer } from 'react-toastify'
+import { AdminRequire } from './Components/Admin/AdminRequire'
+import Categories from './Components/Admin/Categories/Catagories'
+import Loader from './Components/Common/Loader'
+import Create from './Components/Admin/Categories/Create'
+import Edit from './Components/Admin/Categories/Edit'
+import Brands from './Components/Admin/Brands/Brands'
+import {default as BrandCreate} from './Components/Admin/Brands/Create'
+import {default as BrandEdit} from './Components/Admin/Brands/Edit'
+import {default as Adminproducts} from './Components/Admin/Products/Products'
+import {default as AdminProductCreate} from './Components/Admin/Products/Create'
+import {default as AdminProductEdit} from './Components/Admin/Products/Edit'
+import Shop from './Components/Shop/Shop'
+import ProductDetail from './Components/ProductDetail/ProductDetail'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [orderPopup, setOrderPopup] = React.useState(false);
+
+  const handleOrderPopup = () => {
+    setOrderPopup(!orderPopup);
+  };
+  React.useEffect(() => {
+    AOS.init({
+      offset: 100,
+      duration: 800,
+      easing: "ease-in-sine",
+      delay: 100,
+    });
+    AOS.refresh();
+  }, []);
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+    <BrowserRouter>
+    <Routes>
+
+      <Route path="/" element={<Home/>}/>
+  
+    <Route path="/" element={<Navbar  handleOrderPopup={handleOrderPopup}/>}/>
+    <Route path="/" element=  {<Hero  handleOrderPopup={handleOrderPopup}/>}/>
+    <Route path="/" element={<Products/>}/>
+    <Route path="/" element={<TopProducts handleOrderPopup={handleOrderPopup}/>}/>
+    <Route path="/" element={ < Banner/>}/>
+    <Route path="/" element={ <Subscribe/>}/>
+    <Route path="/" element={ <Testimonial/>}/>
+    <Route path="/" element={ <Footer/>}/>
+    <Route path="/Loader" element={ <Loader/>}/>
+    <Route path="/Shop" element={ <Shop/>}/>
+    <Route path="/ProductDetail/:id" element={ <ProductDetail/>}/>
+    <Route path="/" element={ <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />}/>
+    
+    <Route path="/login" element={<Login/>}/>
+    <Route path="/signup" element={<SignUp/>}/>
+    <Route path="/dashboard" element={
+      <AdminRequire>
+      <Dashbord/>
+      </AdminRequire>
+      
+      }/>
+      <Route path="/categories" element={
+      <AdminRequire>
+      <Categories/>
+      </AdminRequire>
+  }/>
+
+  <Route path="/categories/create" element={
+      <AdminRequire>
+      <Create/>
+      </AdminRequire>
+  }/>
+
+<Route path="/categories/edit/:id" element={
+      <AdminRequire>
+      <Edit/>
+      </AdminRequire>
+  }/>
+
+<Route path="/brands" element={
+      <AdminRequire>
+      <Brands/>
+      </AdminRequire>
+  }/>
+
+<Route path="/brands/create" element={
+      <AdminRequire>
+      <BrandCreate/>
+      </AdminRequire>
+  }/>
+
+<Route path="/brands/edit/:id" element={
+      <AdminRequire>
+      <BrandEdit/>
+      </AdminRequire>
+  }/>
+  <Route path="/products" element={
+      <AdminRequire>
+      <Adminproducts/>
+      </AdminRequire>
+  }/>
+  <Route path="/products/create" element={
+      <AdminRequire>
+      <AdminProductCreate/>
+      </AdminRequire>
+  }/>
+
+  <Route path="/products/edit/:id" element={
+      <AdminRequire>
+      <AdminProductEdit/>
+      </AdminRequire>
+  }/>
+    
+
+
+    </Routes>
+  </BrowserRouter>
+  <ToastContainer />
+     
     </>
   )
 }
