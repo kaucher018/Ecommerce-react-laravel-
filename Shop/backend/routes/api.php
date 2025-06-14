@@ -9,17 +9,28 @@ use App\Http\Controllers\admin\sizeController;
 use App\Http\Controllers\admin\productController;
 use App\Http\Controllers\admin\TempImageController;
 use App\Http\Controllers\font\productController as fontProductController;
+use App\Http\Controllers\font\OderController;
+use App\Http\Controllers\font\accountController;
+
+Route::group(['middleware' => ['auth:sanctum','checkuserrole']], function () {
+    Route::post('/saveOrder', [OderController::class,'saveOrder']);
+    Route::get('/getOderdetails/{id}', [accountController::class,'getOderdetails']);
+
+});
 
 
 
 Route::post('/login', [authController::class,'authenticate']);
-Route::post('/register', [authController::class,'register']);
+// Route::post('/register', [accountController::class,'register']);
 Route::get('/showproducts', [fontProductController::class,'showproducts']);
 Route::get('/bestproducts', [fontProductController::class,'bestproducts']);
 Route::get('/getcategories', [fontProductController::class,'getcategories']);
 Route::get('/getbrands', [fontProductController::class,'getbrands']);
 Route::get('/getproduct', [fontProductController::class,'getproduct']);
 Route::get('/getproductdetail/{id}', [fontProductController::class,'getproductdetail']);
+Route::post('/register',[accountController::class,'register']);
+Route::post('/userLogin',[accountController::class,'authenticate']);
+
 
 
 
@@ -28,14 +39,14 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::group(['middleware' => 'auth:sanctum'], function () {
+Route::group(['middleware' => ['auth:sanctum','checkadminrole']], function () {
     // Route::get('/categories', [categoriesController::class,'index']);
     // Route::post('/categories', [categoriesController::class,'store']);
     // Route::put('/categories/{id}', [categoriesController::class,'update']);
     // Route::delete('/categories/{id}', [categoriesController::class,'delete']);
     // Route::get('/categories/{id}', [categoriesController::class,'show']);
 
-    Route::resource('categories', categoriesController::class);// can reduse code writing || check route list is terminal : php artisan route:list
+   Route::resource('categories', categoriesController::class);// can reduse code writing || check route list is terminal : php artisan route:list
     Route::resource('brands', brandsController::class);
     Route::get('/sizes', [sizeController::class,'index']);
     Route::resource('products', productController::class);
@@ -50,3 +61,4 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::delete('deleteproductimage/{id}', [productController::class,'deleteProductImage']);
    
 });
+//  Route::resource('categories', categoriesController::class)->middleware('checkadminrole');

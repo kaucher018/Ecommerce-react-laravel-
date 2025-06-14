@@ -57,33 +57,7 @@ class authController extends Controller
 
 
 
-    function register(Request $request){
-        $validator = Validator::make($request->all(), [
-            'name' => 'required',
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
-
-        if($validator->fails()){
-            return response()->json([
-                'status' => 400,
-                'errors' => $validator->errors()],400);
-        }
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => bcrypt($request->password),
-    
-        ]);
-        $token = $user->createToken('myapptoken')->plainTextToken;
-        return response()->json([
-            'status' => 201,
-            'message' => 'User created successfully',
-            'token' => $token,
-            'userID' => $user->id,
-            'name' => $user->name
-        ],201);
-    }
+   
 
    
 }

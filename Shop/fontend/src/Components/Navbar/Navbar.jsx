@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { FaUserCircle } from "react-icons/fa";
 import { FaTachometerAlt } from 'react-icons/fa';
 import { Link } from "react-router-dom";
+import { useContext } from "react";
+import { CartContext } from "../Cart/Cart";
 
 
 
@@ -59,6 +61,7 @@ const DropdownLinks = [
 
 const Navbar = ({ handleOrderPopup}) => {
   const navigate = useNavigate();
+  const { getquantity } = useContext(CartContext);
 
   const handleLoginPopup = () => {
     
@@ -83,7 +86,7 @@ const Navbar = ({ handleOrderPopup}) => {
           <div>
             <a href="#" className="font-bold text-2xl sm:text-3xl flex gap-2">
               <img src={Logo} alt="Logo" className="w-10" />
-             <span className="text-white">Shopsy</span> 
+             <span className="text-white">LogeAchi.com</span> 
             </a>
           </div>
 
@@ -104,29 +107,25 @@ const Navbar = ({ handleOrderPopup}) => {
   <>
 
 <button
-              className="bg-gradient-to-r from-primary to-secondary transition-all duration-200 text-white  py-1 px-4 rounded-full flex items-center gap-3 group"
-            >
+              className="bg-gradient-to-r from-primary to-secondary transition-all duration-200 text-white  py-1 px-4 rounded-full flex items-center gap-3 group">
               <span className="text-green-600 cursor-pointer group-hover:block hidden transition-all duration-200" >
              <Link to="/dashboard"> {JSON.parse(localStorage.getItem("Admininfo")).name}'s Dashboard   </Link> 
               </span>
               <FaTachometerAlt className="text-2xl text-green-600 hover:text-primary cursor-pointer" />
 
             </button>
-
-
-
-
-
-  
     <button
       className="bg-gradient-to-r from-primary to-secondary transition-all duration-200 text-white py-1 px-4 rounded-full flex items-center gap-3 group"
     >
        Welcome Boss!
       <FaUserCircle className="text-2xl text-gray-600 hover:text-primary cursor-pointer" /> 
     </button>
-    <button onClick={() => logoutuser()}>
-      LogOut
-    </button>
+   <div className="relative cursor-pointer" onClick={() => navigate("/Cart")}>
+      <FaCartShopping className="text-xl text-white drop-shadow-sm" />
+      <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full shadow">
+        {getquantity()}
+      </span>
+    </div>
   </>
 ) :
        

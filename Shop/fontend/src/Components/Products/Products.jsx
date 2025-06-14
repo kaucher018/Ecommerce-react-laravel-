@@ -28,7 +28,7 @@ const fetchproducts = async() =>{
   }).then(res=> res.json())
   .then(result =>  {
       if(result.status == 200){
-        console.log(result.products)
+      
           setProductsData(result.products);
           
         

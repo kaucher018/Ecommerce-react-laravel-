@@ -106,7 +106,7 @@ const Edit = ({ placeholder }) => {
           navigate("/products");
           toast.success(result.message);
         } else {
-          console.log("Error");
+          console.error(result.error || result.message);
         }
       });
   };

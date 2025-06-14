@@ -30,6 +30,12 @@ import {default as AdminProductCreate} from './Components/Admin/Products/Create'
 import {default as AdminProductEdit} from './Components/Admin/Products/Edit'
 import Shop from './Components/Shop/Shop'
 import ProductDetail from './Components/ProductDetail/ProductDetail'
+import Cartdisplay from './Components/Cart/Cartdisplay'
+import Userlogin from './Components/login/userlogin'
+import UserProfile from './Components/Profile/UserProfile'
+import { AuthRequire } from './Components/Context/AuthRequire'
+import Checkout from './Components/Checkout/Checkout'
+import OrderConfirmation from './Components/OrderConfirmation/OrderConfirmation'
 
 function App() {
   const [orderPopup, setOrderPopup] = React.useState(false);
@@ -52,8 +58,9 @@ function App() {
     <BrowserRouter>
     <Routes>
 
+ {/* userroutes */}
+
       <Route path="/" element={<Home/>}/>
-  
     <Route path="/" element={<Navbar  handleOrderPopup={handleOrderPopup}/>}/>
     <Route path="/" element=  {<Hero  handleOrderPopup={handleOrderPopup}/>}/>
     <Route path="/" element={<Products/>}/>
@@ -65,10 +72,37 @@ function App() {
     <Route path="/Loader" element={ <Loader/>}/>
     <Route path="/Shop" element={ <Shop/>}/>
     <Route path="/ProductDetail/:id" element={ <ProductDetail/>}/>
+    <Route path="/Cart" element={ <Cartdisplay/>}/>
     <Route path="/" element={ <Popup orderPopup={orderPopup} setOrderPopup={setOrderPopup} />}/>
-    
-    <Route path="/login" element={<Login/>}/>
+    <Route path="/Userlogin" element={<Userlogin/>}/>
     <Route path="/signup" element={<SignUp/>}/>
+   
+   
+
+<Route path="/user/dashboard" element={
+      <AuthRequire>
+     <UserProfile/>
+      </AuthRequire>
+ }/>
+
+ <Route path="/checkout" element={
+      <AuthRequire>
+     <Checkout/>
+      </AuthRequire>
+ }/>
+
+ <Route path="/OrderConfirmation/:id" element={
+      <AuthRequire>
+     <OrderConfirmation/>
+      </AuthRequire>
+ }/>
+
+ 
+
+   
+{/* admin routes */}
+ <Route path="/login" element={<Login/>}/>
+
     <Route path="/dashboard" element={
       <AdminRequire>
       <Dashbord/>

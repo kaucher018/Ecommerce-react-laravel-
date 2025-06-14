@@ -26,7 +26,7 @@ const navigate = useNavigate();
     }).then(res=> res.json())
     .then(result =>  {
         if(result.status == 200){
-          console.log(result.products)
+        
             setProductsData(result.products);
             
           
@@ -58,7 +58,7 @@ const navigate = useNavigate();
         {/* Body section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-5 md:gap-5 mb-50 place-items-center" style={{marginTop:"150px"}}>
           {ProductsData.map((data) => (
-            <div
+            <div key={data.id}
             onClick={() => navigate(`/ProductDetail/${data.id}`)}
               data-aos="zoom-in"
               className="rounded-2xl w-full bg-white dark:bg-gray-800 hover:bg-black/80 dark:hover:bg-primary hover:text-white relative shadow-xl duration-300 group max-w-[300px]"

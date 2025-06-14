@@ -58,10 +58,15 @@ const Create = ({ placeholder }) => {
           navigate("/products");
           toast.success(result.message);
         } else {
-          console.log("Error");
+          console.error(result); // log the entire result object
+          console.error(result.error); // log the error message, if available
+          console.error(result.message); // log the error message, if available
         }
+      })
+      .catch((error) => {
+        console.error(error); // log any catched errors
       });
-  };
+};
 
   //fetch categories
   const fetchCategories = async () => {

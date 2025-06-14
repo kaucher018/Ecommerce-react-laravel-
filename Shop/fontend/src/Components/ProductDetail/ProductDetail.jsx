@@ -2,6 +2,10 @@ import { useState, useEffect } from "react";
 import Navbar from "../Navbar/Navbar";
 import { useParams } from "react-router-dom";
 import { API_URL } from "../Common/Http";
+import { useContext } from "react";
+import { CartContext } from "../Cart/Cart";
+import { toast } from "react-toastify";
+
 
 
 export default function ProductDetail() {
@@ -10,6 +14,8 @@ export default function ProductDetail() {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [size, setsize] = useState([]);
   const params = useParams();
+  const { addtocart } = useContext(CartContext);
+  const [selectedSize, setSelectedSize] = useState(null);
 
   const fetchproducts = () => {
     fetch(`${API_URL}getproductdetail/${params.id}`, {
@@ -22,9 +28,12 @@ export default function ProductDetail() {
       .then((res) => res.json())
       .then((result) => {
         if (result.status == 200) {
+          
           setProduct(result.data);
           setproductimages(result.data.product_images);
           setsize(result.data.product_sizes);
+          // console.log(size.size.id);
+         
         
         } else {
           console.log("Error");
@@ -47,6 +56,22 @@ export default function ProductDetail() {
       prev === productimages.length - 1 ? 0 : prev + 1
     );
   };
+  const handleaddtocart = () => {
+    if(size.length > 0){
+      if(selectedSize == null){
+        toast.error("Please select a size");
+      }else{
+        addtocart(product, selectedSize); 
+        toast.success(" Sucksexfully Product added to cart");
+        // console.log(selectedSize);
+        // console.log(size);
+    }
+  } else {
+    addtocart(product,null);
+  }
+    
+
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -127,8 +152,13 @@ export default function ProductDetail() {
            <div className="flex gap-3">
               { size.map((size) => (
                 <button
-                  key={size.id}
-                  className="px-4 py-1 text-sm border border-gray-400 rounded hover:bg-gray-100"
+                onClick={() => setSelectedSize(size.size.name)  }
+                  key={size.size_id}
+                  value={size.size_id}
+                  className={`px-4 py-1 text-sm border border-gray-400 rounded hover:bg-gray-100 
+                    ${selectedSize == size.size.name ? "bg-teal-400 text-white hover:bg-teal-500" : ""}
+
+                  }`}
                 >
                   {size.size.name} 
                 </button>
@@ -136,7 +166,7 @@ export default function ProductDetail() {
             </div> 
           </div>
 
-          <button className="bg-teal-400 hover:bg-teal-500 text-white font-semibold px-6 py-2 rounded">
+          <button onClick={() => handleaddtocart()} className="bg-teal-400 hover:bg-teal-500 text-white font-semibold px-6 py-2 rounded">
             ADD TO CART
           </button>
 
